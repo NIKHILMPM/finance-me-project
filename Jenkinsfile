@@ -64,6 +64,12 @@ pipeline {
                         ssh -o StrictHostKeyChecking=no ubuntu@${EC2_IP} "docker pull ${IMAGE_NAME}:latest"
                         ssh -o StrictHostKeyChecking=no ubuntu@${EC2_IP} "docker stop financeme-container || true"
                         ssh -o StrictHostKeyChecking=no ubuntu@${EC2_IP} "docker rm financeme-container || true"
+                        ssh -o StrictHostKeyChecking=no ubuntu@${EC2_IP} '
+                            CONTAINER_ID=\$(docker ps --filter "publish=8081" --format "{{.ID}}");
+                            if [ ! -z "\$CONTAINER_ID" ]; then
+                                docker rm -f \$CONTAINER_ID;
+                            fi
+                        '
                         ssh -o StrictHostKeyChecking=no ubuntu@${EC2_IP} "docker run -d --name financeme-container -p 8081:8080 ${IMAGE_NAME}:latest"
                     """
                 }
