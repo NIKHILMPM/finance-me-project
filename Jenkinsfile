@@ -26,8 +26,8 @@ pipeline {
                 script {
                     docker.withRegistry('https://index.docker.io/v1/', "${DOCKERHUB_CREDENTIALS}") {
                         sh """
-                        docker build -t ${IMAGE_NAME}:latest .
-                        docker push ${IMAGE_NAME}:latest
+                            docker build -t ${IMAGE_NAME}:latest .
+                            docker push ${IMAGE_NAME}:latest
                         """
                     }
                 }
@@ -38,12 +38,10 @@ pipeline {
             steps {
                 sshagent (credentials: ["${SSH_CREDENTIALS}"]) {
                     sh """
-                    ssh -o StrictHostKeyChecking=no ubuntu@${EC2_IP} << EOF
-                      docker pull ${IMAGE_NAME}:latest
-                      docker stop financeme-container || true
-                      docker rm financeme-container || true
-                      docker run -d --name financeme-container -p 8081:8080 ${IMAGE_NAME}:latest
-                    EOF
+                        ssh -o StrictHostKeyChecking=no ubuntu@${EC2_IP} "docker pull ${IMAGE_NAME}:latest"
+                        ssh -o StrictHostKeyChecking=no ubuntu@${EC2_IP} "docker stop financeme-container || true"
+                        ssh -o StrictHostKeyChecking=no ubuntu@${EC2_IP} "docker rm financeme-container || true"
+                        ssh -o StrictHostKeyChecking=no ubuntu@${EC2_IP} "docker run -d --name financeme-container -p 8081:8080 ${IMAGE_NAME}:latest"
                     """
                 }
             }
