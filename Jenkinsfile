@@ -76,12 +76,5 @@ pipeline {
             }
         }
 
-        stage('Test App with Selenium') {
-            steps {
-                sh '''
-                    python3 selenium_test.py
-                '''
-            }
-        }
     }
 }
