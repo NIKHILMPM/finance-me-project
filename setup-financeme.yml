@@ -22,11 +22,13 @@
 
     - name: Stop container using port 8081 if any
       shell: |
+        {% raw %}
         CONTAINER_ID=$(docker ps --filter "publish=8081" --format "{{.ID}}")
         if [ -n "$CONTAINER_ID" ]; then
           docker rm -f $CONTAINER_ID
         fi
+        {% endraw %}
       ignore_errors: yes
-
+      
     - name: Deploy Docker Container
       command: docker run -itd -p 8081:8080 ramachandrampm/financeme-image:latest
