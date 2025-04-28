@@ -1,0 +1,33 @@
+---
+- name: Configure Docker and Deploy FinanceMe App
+  hosts: finance
+  become: true
+  tasks:
+    - name: Update apt packages
+      apt:
+        update_cache: yes
+
+    - name: Install Docker
+      apt:
+        name: docker.io
+        state: present
+
+    - name: Start Docker Service
+      service:
+        name: docker
+        state: started
+        enabled: yes
+
+    - name: Pull FinanceMe Docker Image
+      command: docker pull ramachandrampm/financeme-image:latest
+
+    - name: Stop existing FinanceMe Container (if running)
+      command: docker stop financeme-container
+      ignore_errors: yes
+
+    - name: Remove existing FinanceMe Container (if exists)
+      command: docker rm financeme-container
+      ignore_errors: yes
+
+    - name: Run FinanceMe Container
+      command: docker run -d --name financeme-container -p 8081:8080 ramachandrampm/financeme-image:latest
