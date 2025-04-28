@@ -5,7 +5,7 @@ pipeline {
         DOCKERHUB_CREDENTIALS = 'dockerhub-creds'
         IMAGE_NAME = 'ramachandrampm/financeme-image'
         SSH_CREDENTIALS = 'ec2-ssh-key'
-        EC2_IP = '54.167.8.65'
+        EC2_IP = '54.167.8.65'  // If you are not using dynamic Terraform output
     }
 
     stages {
@@ -34,7 +34,25 @@ pipeline {
             }
         }
 
-        stage('Deploy to EC2') {
+        stage('Provision Infrastructure with Terraform') {
+            steps {
+                sh '''
+                    cd terraform
+                    terraform init
+                    terraform apply -auto-approve
+                '''
+            }
+        }
+
+        stage('Configure Server with Ansible') {
+            steps {
+                sh '''
+                    ansible-playbook -i inventory.ini setup-financeme.yml
+                '''
+            }
+        }
+
+        stage('Deploy Docker Container') {
             steps {
                 sshagent (credentials: ["${SSH_CREDENTIALS}"]) {
                     sh """
@@ -44,6 +62,14 @@ pipeline {
                         ssh -o StrictHostKeyChecking=no ubuntu@${EC2_IP} "docker run -d --name financeme-container -p 8081:8080 ${IMAGE_NAME}:latest"
                     """
                 }
+            }
+        }
+
+        stage('Test App with Selenium') {
+            steps {
+                sh '''
+                    python3 selenium_test.py
+                '''
             }
         }
     }
