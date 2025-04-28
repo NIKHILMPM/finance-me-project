@@ -1,16 +1,24 @@
-- name : Configure Docker on EC2 Instances
-  hosts : all
+- name: Configure Docker on EC2 Instances
+  hosts: all
   become: true
-  connection : ssh
-  tasks : 
-  - name: updating apt
-    command : sudo apt-get update
+  connection: ssh
+  tasks:
+    - name: updating apt
+      command: sudo apt-get update
 
-  - name : Install Docker
-    command : sudo apt-get install -y docker.io
+    - name: Install Docker
+      command: sudo apt-get install -y docker.io
 
-  - name : Start Docker Service
-    command : sudo systemctl start docker
+    - name: Start Docker Service
+      command: sudo systemctl start docker
 
-  - name: Deploy Docker Container
-    command: docker run -itd -p 8081:8080 ramachandrampm/financeme-image:latest
+    - name: Stop existing FinanceMe container (if running)
+      command: docker stop financeme-container
+      ignore_errors: yes
+
+    - name: Remove existing FinanceMe container (if exists)
+      command: docker rm financeme-container
+      ignore_errors: yes
+
+    - name: Deploy Docker Container
+      command: docker run -itd -p 8081:8080 ramachandrampm/financeme-image:latest
