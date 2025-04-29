@@ -3,14 +3,14 @@ provider "aws" {
 }
 
 resource "aws_instance" "finance_ec2" {
-  ami           = "ami-0e449927258d45bc4"
+  ami           = "ami-0f9de6e2d2f067fca" 
   instance_type = "t2.micro"
   associate_public_ip_address = true
 
-user_data = <<-EOF
+  user_data = <<-EOF
               #!/bin/bash
-              dnf update -y
-              dnf install -y docker
+              apt update -y
+              apt install -y docker.io
               systemctl start docker
               systemctl enable docker
               docker pull ramachandrampm/financeme-image:latest
@@ -23,7 +23,6 @@ user_data = <<-EOF
 
   vpc_security_group_ids = [aws_security_group.finance_sg.id]
 }
-
 
 resource "aws_security_group" "finance_sg" {
   name        = "finance_sg"
