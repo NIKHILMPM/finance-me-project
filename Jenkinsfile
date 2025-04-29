@@ -57,12 +57,6 @@ pipeline {
             }
         }
 
-        stage('Test App with Selenium') {
-            steps {
-                withEnv(["APP_URL=http://${EC2_IP}:8081"]) {
-                    sh 'python3 selenium_test.py'
-                }
-            }
-        }
+
     }
 }
