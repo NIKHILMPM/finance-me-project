@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         DOCKERHUB_CREDENTIALS = 'dockerhub-creds'
-        IMAGE_NAME = 'yourdockerhubusername/financeme-image'
+        IMAGE_NAME = 'ramachandrampm/financeme-image'
     }
 
     stages {
