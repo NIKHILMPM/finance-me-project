@@ -7,10 +7,10 @@ resource "aws_instance" "finance_ec2" {
   instance_type = "t2.micro"
   associate_public_ip_address = true
 
-  user_data = <<-EOF
+user_data = <<-EOF
               #!/bin/bash
-              apt update -y
-              apt install -y docker.io
+              dnf update -y
+              dnf install -y docker
               systemctl start docker
               systemctl enable docker
               docker pull ramachandrampm/financeme-image:latest
