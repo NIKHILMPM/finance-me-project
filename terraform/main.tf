@@ -39,3 +39,8 @@ resource "aws_security_group" "finance_sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 }
+
+# New added Terraform output
+output "ec2_public_ip" {
+  value = aws_instance.finance_ec2.public_ip
+}
