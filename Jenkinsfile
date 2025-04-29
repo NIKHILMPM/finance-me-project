@@ -1,28 +1,38 @@
 pipeline {
     agent any
 
+    tools {
+        maven 'maven3'   // Jenkins Maven tool name (check Global Tool Config)
+        jdk 'jdk17'      // Jenkins JDK tool name (check Global Tool Config)
+    }
+
     environment {
         DOCKERHUB_CREDENTIALS = 'dockerhub-creds'
-        IMAGE_NAME = 'ramachandrampm/financeme-image'
-        // No SSH_CREDENTIALS needed now
+        IMAGE_NAME = 'yourdockerhubusername/financeme-image'
     }
 
     stages {
         stage('Checkout Code') {
             steps {
-                git branch: 'main', credentialsId: 'github-creds', url: 'https://github.com/NIKHILMPM/finance-me-project.git'
+                checkout scm
             }
         }
 
         stage('Build with Maven') {
             steps {
-                sh 'mvn clean package'
+                sh 'mvn clean install -DskipTests'
             }
         }
 
         stage('Run JUnit Tests') {
             steps {
                 sh 'mvn test'
+            }
+        }
+
+        stage('Publish JUnit Reports') {
+            steps {
+                junit 'target/surefire-reports/*.xml'
             }
         }
 
@@ -54,7 +64,7 @@ pipeline {
             }
         }
 
-        stage('Get Terraform Output (Dynamic IP)') {
+        stage('Get Terraform Output (Dynamic EC2 IP)') {
             steps {
                 script {
                     env.EC2_IP = sh(script: "cd terraform && terraform output -raw ec2_public_ip", returnStdout: true).trim()
@@ -77,18 +87,28 @@ pipeline {
                 sh 'ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i inventory.ini setup-finance.yml'
             }
         }
-        
-        stage('Test App with Selenium') {
+
+        stage('Wait for App to Start') {
             steps {
-                withEnv(["APP_URL=http://${EC2_IP}:8081"]) {
-                    sh '''
-                        echo "Waiting 40 seconds for app to be ready..."
-                        sleep 40
-                        python3 selenium_test.py
-                    '''
-                }
+                sh 'echo "Waiting for application to be ready..." && sleep 40'
             }
         }
 
+        stage('Test App with Selenium') {
+            steps {
+                withEnv(["APP_URL=http://${EC2_IP}:8081"]) {
+                    sh 'python3 selenium_test.py'
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            echo '✅ Pipeline finished successfully!'
+        }
+        failure {
+            echo '❌ Pipeline failed!'
+        }
     }
 }
