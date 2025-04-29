@@ -14,7 +14,7 @@ chrome_options.add_argument(f"--user-data-dir={user_data_dir}")
 
 driver = webdriver.Chrome(options=chrome_options)
 
-url = "http://34.229.221.148:8081"
+url = "http://34.227.225.133:8081"
 
 driver.get(url)
 
