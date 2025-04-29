@@ -57,6 +57,12 @@ pipeline {
             }
         }
 
+        stage('Cleanup Old Inventory File') {
+            steps {
+                sh 'rm -f inventory.ini || true'
+            }
+        }
+
         stage('Configure Server with Ansible') {
             steps {
                 script {
