@@ -3,7 +3,7 @@ provider "aws" {
 }
 
 resource "aws_instance" "finance_ec2" {
-  ami           = "ami-0f9de6e2d2f067fca" 
+  ami           = "ami-0e449927258d45bc4"
   instance_type = "t2.micro"
   associate_public_ip_address = true
 
@@ -14,7 +14,7 @@ resource "aws_instance" "finance_ec2" {
               systemctl start docker
               systemctl enable docker
               docker pull ramachandrampm/financeme-image:latest
-              docker run -d --name financeme-container -p 8081:8080 ramachandrampm/financeme-image:latest
+              docker run -d --name financeme-container -p 8081:8081 ramachandrampm/financeme-image:latest
               EOF
 
   tags = {
