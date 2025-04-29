@@ -52,7 +52,7 @@ pipeline {
             steps {
                 script {
                     env.EC2_IP = sh(script: "cd terraform && terraform output -raw ec2_public_ip", returnStdout: true).trim()
-                    echo "New EC2 IP is: ${env.EC2_IP}"
+                    echo "Dynamic EC2 Public IP: ${env.EC2_IP}"
                 }
             }
         }
@@ -69,10 +69,10 @@ pipeline {
                           docker pull ${IMAGE_NAME}:latest &&
                           docker stop financeme-container || true &&
                           docker rm financeme-container || true &&
-                          CONTAINER_ID=\$(docker ps --filter "publish=8081" --format "{{.ID}}");
+                          CONTAINER_ID=\$(docker ps --filter "publish=8081" --format "{{.ID}}")
                           if [ ! -z "\$CONTAINER_ID" ]; then
-                              docker rm -f \$CONTAINER_ID;
-                          fi &&
+                              docker rm -f \$CONTAINER_ID
+                          fi
                           docker run -d --name financeme-container -p 8081:8080 ${IMAGE_NAME}:latest
                         '
                     """
@@ -82,9 +82,9 @@ pipeline {
 
         stage('Test App with Selenium') {
             steps {
-                sh '''
-                    python3 selenium_test.py
-                '''
+                withEnv(["APP_URL=http://${EC2_IP}:8081"]) {
+                    sh 'python3 selenium_test.py'
+                }
             }
         }
     }
