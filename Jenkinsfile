@@ -4,7 +4,7 @@ pipeline {
     environment {
         DOCKERHUB_CREDENTIALS = 'dockerhub-creds'
         IMAGE_NAME = 'ramachandrampm/financeme-image'
-        SSH_CREDENTIALS = 'ec2-ssh-key'
+        // No SSH_CREDENTIALS needed now
     }
 
     stages {
@@ -52,30 +52,7 @@ pipeline {
             steps {
                 script {
                     env.EC2_IP = sh(script: "cd terraform && terraform output -raw ec2_public_ip", returnStdout: true).trim()
-                    echo "Dynamic EC2 Public IP: ${env.EC2_IP}"
-                }
-            }
-        }
-
-        stage('Configure Server and Deploy App') {
-            steps {
-                sshagent (credentials: ["${SSH_CREDENTIALS}"]) {
-                    sh """
-                        ssh -o StrictHostKeyChecking=no ubuntu@${EC2_IP} '
-                          sudo apt update &&
-                          sudo apt install -y docker.io &&
-                          sudo systemctl start docker &&
-                          sudo systemctl enable docker &&
-                          docker pull ${IMAGE_NAME}:latest &&
-                          docker stop financeme-container || true &&
-                          docker rm financeme-container || true &&
-                          CONTAINER_ID=\$(docker ps --filter "publish=8081" --format "{{.ID}}")
-                          if [ ! -z "\$CONTAINER_ID" ]; then
-                              docker rm -f \$CONTAINER_ID
-                          fi
-                          docker run -d --name financeme-container -p 8081:8080 ${IMAGE_NAME}:latest
-                        '
-                    """
+                    echo "New EC2 Public IP: ${env.EC2_IP}"
                 }
             }
         }
