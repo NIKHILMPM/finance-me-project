@@ -20,6 +20,12 @@ pipeline {
             }
         }
 
+        stage('Run JUnit Tests') {
+            steps {
+                sh 'mvn test'
+            }
+        }
+
         stage('Build and Push Docker Image') {
             steps {
                 script {
