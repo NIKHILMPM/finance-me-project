@@ -5,7 +5,6 @@ pipeline {
         DOCKERHUB_CREDENTIALS = 'dockerhub-creds'
         IMAGE_NAME = 'ramachandrampm/financeme-image'
         SSH_CREDENTIALS = 'ec2-ssh-key'
-        EC2_IP = '34.227.225.133' // If you are not using dynamic Terraform output
     }
 
     stages {
@@ -49,28 +48,33 @@ pipeline {
             }
         }
 
-        stage('Configure Server with Ansible') {
+        stage('Get Terraform Output (Dynamic IP)') {
             steps {
-                sh '''
-                    ansible-playbook -i inventory.ini setup-financeme.yml
-                '''
+                script {
+                    env.EC2_IP = sh(script: "cd terraform && terraform output -raw ec2_public_ip", returnStdout: true).trim()
+                    echo "New EC2 IP is: ${env.EC2_IP}"
+                }
             }
         }
 
-        stage('Deploy Docker Container') {
+        stage('Configure Server and Deploy App') {
             steps {
                 sshagent (credentials: ["${SSH_CREDENTIALS}"]) {
                     sh """
-                        ssh -o StrictHostKeyChecking=no ubuntu@${EC2_IP} "docker pull ${IMAGE_NAME}:latest"
-                        ssh -o StrictHostKeyChecking=no ubuntu@${EC2_IP} "docker stop financeme-container || true"
-                        ssh -o StrictHostKeyChecking=no ubuntu@${EC2_IP} "docker rm financeme-container || true"
                         ssh -o StrictHostKeyChecking=no ubuntu@${EC2_IP} '
-                            CONTAINER_ID=\$(docker ps --filter "publish=8081" --format "{{.ID}}");
-                            if [ ! -z "\$CONTAINER_ID" ]; then
-                                docker rm -f \$CONTAINER_ID;
-                            fi
+                          sudo apt update &&
+                          sudo apt install -y docker.io &&
+                          sudo systemctl start docker &&
+                          sudo systemctl enable docker &&
+                          docker pull ${IMAGE_NAME}:latest &&
+                          docker stop financeme-container || true &&
+                          docker rm financeme-container || true &&
+                          CONTAINER_ID=\$(docker ps --filter "publish=8081" --format "{{.ID}}");
+                          if [ ! -z "\$CONTAINER_ID" ]; then
+                              docker rm -f \$CONTAINER_ID;
+                          fi &&
+                          docker run -d --name financeme-container -p 8081:8080 ${IMAGE_NAME}:latest
                         '
-                        ssh -o StrictHostKeyChecking=no ubuntu@${EC2_IP} "docker run -d --name financeme-container -p 8081:8080 ${IMAGE_NAME}:latest"
                     """
                 }
             }
