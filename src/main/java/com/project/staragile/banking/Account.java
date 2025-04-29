@@ -6,7 +6,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "account") // explicitly sets the table name
+@Table(name = "account")
 public class Account {
 
     @Id
@@ -22,12 +22,9 @@ public class Account {
     @Column(name = "account_balance")
     private double accountBalance;
 
-    // Default constructor
     public Account() {
-        super();
     }
 
-    // Parameterized constructor
     public Account(int accountNumber, String accountName, String accountType, double accountBalance) {
         this.accountNumber = accountNumber;
         this.accountName = accountName;
