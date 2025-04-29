@@ -15,19 +15,8 @@ pipeline {
 
         stage('Build with Maven') {
             steps {
-                sh 'mvn clean install -DskipTests'
-            }
-        }
-
-        stage('Run JUnit Tests') {
-            steps {
-                sh 'mvn test'
-            }
-        }
-
-        stage('Publish JUnit Reports') {
-            steps {
-                junit 'target/surefire-reports/*.xml'
+                sh 'mvn clean install'
+                // Tests will run automatically during Maven build
             }
         }
 
