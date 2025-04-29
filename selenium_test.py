@@ -2,8 +2,8 @@ from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 import time
 import tempfile
+import os
 
-# Create a truly fresh temp dir
 user_data_dir = tempfile.mkdtemp()
 
 chrome_options = Options()
@@ -14,13 +14,13 @@ chrome_options.add_argument(f"--user-data-dir={user_data_dir}")
 
 driver = webdriver.Chrome(options=chrome_options)
 
-url = "http://34.227.225.133:8081"
+# 🔥 Get URL dynamically from environment
+url = os.getenv("APP_URL", "http://localhost:8081")  # default fallback
 
+print(f"Testing URL: {url}")
 driver.get(url)
 
 time.sleep(5)
 
 driver.save_screenshot("homepage.png")
-
 driver.quit()
-
