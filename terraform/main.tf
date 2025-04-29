@@ -3,9 +3,19 @@ provider "aws" {
 }
 
 resource "aws_instance" "finance_ec2" {
-  ami           = "ami-0e449927258d45bc4"  
+  ami           = "ami-0e449927258d45bc4"
   instance_type = "t2.micro"
-  associate_public_ip_address = true 
+  associate_public_ip_address = true
+
+  user_data = <<-EOF
+              #!/bin/bash
+              apt update -y
+              apt install -y docker.io
+              systemctl start docker
+              systemctl enable docker
+              docker pull ramachandrampm/financeme-image:latest
+              docker run -d --name financeme-container -p 8081:8080 ramachandrampm/financeme-image:latest
+              EOF
 
   tags = {
     Name = "FinanceMe-Server"
@@ -13,6 +23,7 @@ resource "aws_instance" "finance_ec2" {
 
   vpc_security_group_ids = [aws_security_group.finance_sg.id]
 }
+
 
 resource "aws_security_group" "finance_sg" {
   name        = "finance_sg"
