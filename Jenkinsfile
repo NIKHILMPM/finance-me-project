@@ -1,11 +1,6 @@
 pipeline {
     agent any
 
-    tools {
-        maven 'maven3'   // Jenkins Maven tool name (check Global Tool Config)
-        jdk 'jdk17'      // Jenkins JDK tool name (check Global Tool Config)
-    }
-
     environment {
         DOCKERHUB_CREDENTIALS = 'dockerhub-creds'
         IMAGE_NAME = 'yourdockerhubusername/financeme-image'
