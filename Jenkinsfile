@@ -56,6 +56,16 @@ pipeline {
                 }
             }
         }
+
+        stage('Configure Server with Ansible') {
+            steps {
+                script {
+                    writeFile file: 'inventory.ini', text: "[finance_servers]\n${env.EC2_IP} ansible_user=ubuntu ansible_ssh_private_key_file=/path/to/key.pem"
+                }
+                sh 'ansible-playbook -i inventory.ini setup-finance.yml'
+            }
+        }
+
         stage('Test App with Selenium') {
             steps {
                 withEnv(["APP_URL=http://${EC2_IP}:8081"]) {
