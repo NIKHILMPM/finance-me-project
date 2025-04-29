@@ -75,9 +75,14 @@ pipeline {
         stage('Test App with Selenium') {
             steps {
                 withEnv(["APP_URL=http://${EC2_IP}:8081"]) {
-                    sh 'python3 selenium_test.py'
+                    sh '''
+                        echo "Waiting 40 seconds for app to be ready..."
+                        sleep 40
+                        python3 selenium_test.py
+                    '''
                 }
             }
         }
+
     }
 }
