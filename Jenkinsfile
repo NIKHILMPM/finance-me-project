@@ -5,7 +5,7 @@ pipeline {
         DOCKERHUB_CREDENTIALS = 'dockerhub-creds'
         IMAGE_NAME = 'ramachandrampm/financeme-image'
         SSH_CREDENTIALS = 'ec2-ssh-key'
-        EC2_IP = '34.229.221.148' // If you are not using dynamic Terraform output
+        EC2_IP = '34.227.225.133' // If you are not using dynamic Terraform output
     }
 
     stages {
