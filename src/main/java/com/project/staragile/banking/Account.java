@@ -1,68 +1,70 @@
 package com.project.staragile.banking;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.Table;
 
 @Entity
+@Table(name = "account") // explicitly sets the table name
 public class Account {
 
-	@Id
-	private int accountNumber;
-	
-	private String accountName;
-	
-	private String accountType;
-	
-	private double accountBalance;
+    @Id
+    @Column(name = "account_number")
+    private int accountNumber;
 
-	public Account(int accountNumber, String accountName, String accountType, double accountBalance) {
-		super();
-		this.accountNumber = accountNumber;
-		this.accountName = accountName;
-		this.accountType = accountType;
-		this.accountBalance = accountBalance;
-	}
+    @Column(name = "account_name")
+    private String accountName;
 
-	public Account() {
-		super();
-		// TODO Auto-generated constructor stub
-	}
+    @Column(name = "account_type")
+    private String accountType;
 
-	public int getAccountNumber() {
-		return accountNumber;
-	}
+    @Column(name = "account_balance")
+    private double accountBalance;
 
-	public void setAccountNumber(int accountNumber) {
-		this.accountNumber = accountNumber;
-	}
+    // Default constructor
+    public Account() {
+        super();
+    }
 
-	public String getAccountName() {
-		return accountName;
-	}
+    // Parameterized constructor
+    public Account(int accountNumber, String accountName, String accountType, double accountBalance) {
+        this.accountNumber = accountNumber;
+        this.accountName = accountName;
+        this.accountType = accountType;
+        this.accountBalance = accountBalance;
+    }
 
-	public void setAccountName(String accountName) {
-		this.accountName = accountName;
-	}
+    // Getters and Setters
+    public int getAccountNumber() {
+        return accountNumber;
+    }
 
-	public String getAccountType() {
-		return accountType;
-	}
+    public void setAccountNumber(int accountNumber) {
+        this.accountNumber = accountNumber;
+    }
 
-	public void setAccountType(String accountType) {
-		this.accountType = accountType;
-	}
+    public String getAccountName() {
+        return accountName;
+    }
 
-	public double getAccountBalance() {
-		return accountBalance;
-	}
+    public void setAccountName(String accountName) {
+        this.accountName = accountName;
+    }
 
-	public void setAccountBalance(double accountBalance) {
-		this.accountBalance = accountBalance;
-	}
-	
-	
-	
-	
-	
-	
+    public String getAccountType() {
+        return accountType;
+    }
+
+    public void setAccountType(String accountType) {
+        this.accountType = accountType;
+    }
+
+    public double getAccountBalance() {
+        return accountBalance;
+    }
+
+    public void setAccountBalance(double accountBalance) {
+        this.accountBalance = accountBalance;
+    }
 }
