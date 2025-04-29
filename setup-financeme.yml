@@ -1,9 +1,8 @@
 - name: Configure Docker on EC2 Instances
   hosts: all
   become: true
-  connection: ssh
   tasks:
-    - name: updating apt
+    - name: Update apt
       command: sudo apt-get update
 
     - name: Install Docker
@@ -20,7 +19,7 @@
       command: docker rm financeme-container
       ignore_errors: yes
 
-    - name: Stop container using port 8081 if any
+    - name: Free port 8081 if used
       shell: |
         {% raw %}
         CONTAINER_ID=$(docker ps --filter "publish=8081" --format "{{.ID}}")
@@ -29,6 +28,6 @@
         fi
         {% endraw %}
       ignore_errors: yes
-      
-    - name: Deploy Docker Container
-      command: docker run -itd -p 8081:8080 ramachandrampm/financeme-image:latest
+
+    - name: Deploy FinanceMe Container
+      command: docker run -d --name financeme-container -p 8081:8080 ramachandrampm/financeme-image:latest
