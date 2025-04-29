@@ -18,12 +18,12 @@ class BankingApplicationTests {
 
     @Test
     void contextLoads() {
-        // This test just checks if Spring Boot app context loads successfully
+        // Basic test to ensure Spring context loads
     }
 
     @Test
     void testCreateAccount() throws Exception {
-        String json = "{\"name\": \"John Doe\", \"accountType\": \"Saving\"}";
+        String json = "{\"accountNumber\": 2, \"accountName\": \"John Doe\", \"accountType\": \"Saving\", \"accountBalance\": 10000.0}";
 
         mockMvc.perform(post("/createAccount")
                 .contentType("application/json")
